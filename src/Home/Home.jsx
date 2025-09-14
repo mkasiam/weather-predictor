@@ -5,7 +5,6 @@ const Home = () => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
-  const api_key = "ec130363a837593bbcc6bd675aff1560";
 
   const handleInputChange = async (e) => {
     const value = e.target.value;
@@ -18,7 +17,7 @@ const Home = () => {
 
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=${api_key}`
+        `https://api.openweathermap.org/geo/1.0/direct?q=${value}&limit=5&appid=${import.meta.env.api_key}`
       );
       const data = await response.json();
       setSuggestions(
