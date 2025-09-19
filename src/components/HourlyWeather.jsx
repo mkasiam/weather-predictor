@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   WiThermometer,
   WiRaindrop,
   WiStrongWind,
-  WiDaySunny,
 } from "react-icons/wi";
 import { fetchWeatherData } from "../services/weatherService";
 import { formatTime, getWeatherIcon } from "../utils/weatherUtils";
@@ -49,7 +48,7 @@ const HourlyWeather = () => {
     return <WeatherNotFound msg={"No hourly forecast available"} />;
   }
 
-  const next24Hours = hourlyData.list.slice(0, 8);
+  const next24Hours = hourlyData.list;
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
@@ -62,7 +61,7 @@ const HourlyWeather = () => {
           {next24Hours.map((hour, index) => (
             <div
               key={index}
-              className="bg-blue-50 rounded-lg p-4 min-w-[140px] text-center hover:bg-blue-100 transition-colors"
+              className="bg-blue-50 rounded-lg p-4 min-w-[140px] text-center hover:bg-blue-100"
             >
               {/* Time */}
               <div className="text-sm text-gray-600 mb-2">

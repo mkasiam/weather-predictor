@@ -5,9 +5,9 @@ import {
   WiRaindrop,
   WiStrongWind,
   WiHumidity,
-  WiSunrise,
-  WiSunset,
 } from "react-icons/wi";
+import { fetchWeatherData } from "../services/weatherService";
+import { formatDate, getWeatherIcon, getDayName } from "../utils/weatherUtils";
 import Loading from "./Loading";
 import ErrorDataLoading from "./ErrorDataLoading";
 import WeatherNotFound from "./WeatherNotFound";
@@ -18,30 +18,12 @@ const DailyWeather = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = import.meta.env.VITE_API_KEY;
-
   useEffect(() => {
     const fetchDailyWeather = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        const geoResponse = await fetch(
-          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
-        );
-        const geoData = await geoResponse.json();
-
-        if (!geoData || geoData.length === 0) {
-          throw new Error("City not found");
-        }
-
-        const { lat, lon } = geoData[0];
-
-        const forecastResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
-        );
-        const forecastData = await forecastResponse.json();
-
+        const forecastData = await fetchWeatherData(city, "forecast");
         setDailyData(forecastData);
       } catch (err) {
         setError(err.message || "Failed to fetch daily forecast");
@@ -50,10 +32,10 @@ const DailyWeather = () => {
       }
     };
 
-    if (city && API_KEY) {
+    if (city) {
       fetchDailyWeather();
     }
-  }, [city, API_KEY]);
+  }, [city]);
 
   if (loading) {
     return <Loading msg={"Loading daily forecast..."} />;
@@ -72,32 +54,6 @@ const DailyWeather = () => {
     if (dailyForecasts.length >= 7) break;
     dailyForecasts.push(dailyData.list[i]);
   }
-
-  const formatDate = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getDayName = (timestamp) => {
-    const date = new Date(timestamp * 1000);
-    const today = new Date();
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    }
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    if (date.toDateString() === tomorrow.toDateString()) {
-      return "Tomorrow";
-    }
-    return date.toLocaleDateString("en-US", { weekday: "long" });
-  };
-
-  const getWeatherIcon = (iconCode) => {
-    return `https://openweathermap.org/img/wn/${iconCode}.png`;
-  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">

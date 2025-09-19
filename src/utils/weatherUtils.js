@@ -41,3 +41,23 @@ export const getWindDirection = (degrees) => {
 export const getWeatherIcon = (iconCode) => {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 };
+
+export const getDayName = (timestamp) => {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleDateString("en-US", { weekday: "long" });
+};
+
+export const formatShortDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+export const getMostFrequent = (arr) => {
+  const frequency = {};
+  arr.forEach((item) => (frequency[item] = (frequency[item] || 0) + 1));
+  return Object.keys(frequency).reduce((a, b) =>
+    frequency[a] > frequency[b] ? a : b
+  );
+};
