@@ -3,19 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 import { WiDaySunny } from "react-icons/wi";
 import CitySuggestions from "../components/CitySuggestions";
+import { PiStampLight } from "react-icons/pi";
 const Home = () => {
-  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
 
   const handleInputChange = async (e) => {
     const value = e.target.value;
-    setQuery(value);
-
-    if (value.length < 2) {
-      setSuggestions([]);
-      return;
-    }
 
     try {
       const response = await fetch(
@@ -50,7 +44,7 @@ const Home = () => {
           {/* Header Section */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <WiDaySunny className="text-6xl text-yellow-300 drop-shadow-lg animate-pulse" />
+              <WiDaySunny className="text-6xl text-yellow-300 drop-shadow-xl animate-pulse" />
               <h1 className="text-5xl font-bold text-white drop-shadow-lg">
                 Weather App
               </h1>
@@ -62,27 +56,28 @@ const Home = () => {
 
           {/* Search Container */}
           <div className="bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20">
+            {/* Input Box  */}
             <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 text-xl" />
+              <FiSearch className="absolute left-4 top-5 text-white/70 text-xl" />
               <input
                 type="text"
-                value={query}
                 onChange={handleInputChange}
                 placeholder="Search for a city..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 focus:border-white/60 focus:outline-none text-white placeholder-white/60 transition-all duration-300 focus:bg-white/25"
+                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 focus:border-white/60 focus:outline-none text-white placeholder-white/60 transition-all duration-300 focus:bg-white/35"
               />
             </div>
 
-            {/* Use the new CitySuggestions component */}
+            {/* CitySuggestions component */}
             <CitySuggestions
               suggestions={suggestions}
               onCityClick={handleCityClick}
             />
 
             {/* Search Tips */}
-            {suggestions.length === 0 && query.length === 0 && (
+            {suggestions.length === 0 && (
               <div className="mt-3 p-3 bg-white/80 rounded-lg">
                 <div className="text-sm text-gray-600">
+                  <PiStampLight className="inline text-xl m-2" />
                   Try searching for cities like "New York", "London", "Tokyo"
                 </div>
               </div>
@@ -90,7 +85,7 @@ const Home = () => {
           </div>
 
           {/* Feature Highlights */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="mt-8 grid grid-cols-3 gap-4">
             <div className="bg-gradient-to-br from-blue-400/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 text-center border border-blue-300/30 hover:from-blue-400/30 hover:to-blue-600/30 transition-all duration-300">
               <div className="text-3xl mb-3">🌤️</div>
               <div className="font-semibold text-white text-lg">
