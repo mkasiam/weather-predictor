@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
-  WiThermometer,
   WiHumidity,
   WiStrongWind,
   WiBarometer,
@@ -11,6 +10,9 @@ import {
 import { FiMapPin, FiEye } from "react-icons/fi";
 import { fetchWeatherData } from "../services/weatherService";
 import { formatTime, getWeatherIcon } from "../utils/weatherUtils";
+import Loading from "./Loading";
+import ErrorDataLoading from "./ErrorDataLoading";
+import WeatherNotFound from "./WeatherNotFound";
 
 const TodayWeather = () => {
   const { city } = useParams();
@@ -23,7 +25,7 @@ const TodayWeather = () => {
       try {
         setLoading(true);
         setError(null);
-        const currentData = await fetchWeatherData(city, 'current');
+        const currentData = await fetchWeatherData(city, "current");
         setWeatherData(currentData);
       } catch (err) {
         setError(err.message || "Failed to fetch weather data");
@@ -38,31 +40,15 @@ const TodayWeather = () => {
   }, [city]);
 
   if (loading) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-gray-500">
-          Loading today's weather...
-        </div>
-      </div>
-    );
+    return <Loading msg={"Loading today's weather..."} />;
   }
 
   if (error) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-red-600">Error: {error}</div>
-      </div>
-    );
+    return <ErrorDataLoading error={error} />;
   }
 
   if (!weatherData) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-gray-500">
-          No weather data available
-        </div>
-      </div>
-    );
+    return <WeatherNotFound />;
   }
 
   const { main, weather, wind, visibility, sys } = weatherData;
@@ -78,8 +64,8 @@ const TodayWeather = () => {
       {/* Main Weather Info */}
       <div className="text-center mb-8">
         <div className="flex justify-center items-center gap-4 mb-4">
-          <img 
-            src={getWeatherIcon(weather[0]?.icon)} 
+          <img
+            src={getWeatherIcon(weather[0]?.icon)}
             alt={weather[0]?.description}
             className="w-16 h-16"
           />

@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { WiThermometer, WiRaindrop, WiStrongWind, WiDaySunny } from "react-icons/wi";
+import {
+  WiThermometer,
+  WiRaindrop,
+  WiStrongWind,
+  WiDaySunny,
+} from "react-icons/wi";
 import { fetchWeatherData } from "../services/weatherService";
 import { formatTime, getWeatherIcon } from "../utils/weatherUtils";
+import Loading from "./Loading";
+import ErrorDataLoading from "./ErrorDataLoading";
+import WeatherNotFound from "./WeatherNotFound";
 
 const HourlyWeather = () => {
   const { city } = useParams();
@@ -15,7 +23,7 @@ const HourlyWeather = () => {
       try {
         setLoading(true);
         setError(null);
-        const forecastData = await fetchWeatherData(city, 'forecast');
+        const forecastData = await fetchWeatherData(city, "forecast");
         setHourlyData(forecastData);
       } catch (err) {
         setError(err.message || "Failed to fetch hourly forecast");
@@ -30,31 +38,15 @@ const HourlyWeather = () => {
   }, [city]);
 
   if (loading) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-gray-500">
-          Loading hourly forecast...
-        </div>
-      </div>
-    );
+    return <Loading msg={"Loading hourly forecast..."} />;
   }
 
   if (error) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-red-600">Error: {error}</div>
-      </div>
-    );
+    return <ErrorDataLoading error={error} />;
   }
 
   if (!hourlyData || !hourlyData.list) {
-    return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-gray-500">
-          No hourly forecast available
-        </div>
-      </div>
-    );
+    return <WeatherNotFound msg={"No hourly forecast available"} />;
   }
 
   const next24Hours = hourlyData.list.slice(0, 8);
