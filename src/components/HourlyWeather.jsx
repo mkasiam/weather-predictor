@@ -1,11 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { WiThermometer, WiRaindrop, WiStrongWind } from 'react-icons/wi';
 
-const HourlyWeather = ({ hourlyData }) => {
-  if (!hourlyData || !hourlyData.list) {
+const HourlyWeather = () => {
+  const { city } = useParams();
+  const [hourlyData, setHourlyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_KEY = import.meta.env.VITE_API_KEY;
+
+  useEffect(() => {
+    const fetchHourlyWeather = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get coordinates for the city
+        const geoResponse = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
+        );
+        const geoData = await geoResponse.json();
+
+        if (!geoData || geoData.length === 0) {
+          throw new Error("City not found");
+        }
+
+        const { lat, lon } = geoData[0];
+
+        // Fetch 5-day forecast (includes hourly data)
+        const forecastResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        );
+        const forecastData = await forecastResponse.json();
+
+        setHourlyData(forecastData);
+      } catch (err) {
+        setError(err.message || "Failed to fetch hourly forecast");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (city && API_KEY) {
+      fetchHourlyWeather();
+    }
+  }, [city, API_KEY]);
+
+  if (loading) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
         <div className="text-center text-gray-500">Loading hourly forecast...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
+  if (!hourlyData || !hourlyData.list) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-gray-500">No hourly forecast available</div>
       </div>
     );
   }

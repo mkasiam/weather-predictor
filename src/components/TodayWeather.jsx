@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { 
   WiThermometer, 
   WiHumidity, 
@@ -10,11 +11,71 @@ import {
 } from 'react-icons/wi';
 import { FiMapPin, FiEye } from 'react-icons/fi';
 
-const TodayWeather = ({ weatherData, cityName }) => {
+const TodayWeather = () => {
+  const { city } = useParams();
+  const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_KEY = import.meta.env.VITE_API_KEY;
+
+  useEffect(() => {
+    const fetchTodayWeather = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get coordinates for the city
+        const geoResponse = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
+        );
+        const geoData = await geoResponse.json();
+
+        if (!geoData || geoData.length === 0) {
+          throw new Error("City not found");
+        }
+
+        const { lat, lon } = geoData[0];
+
+        // Fetch current weather
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        );
+        const currentData = await weatherResponse.json();
+
+        setWeatherData(currentData);
+      } catch (err) {
+        setError(err.message || "Failed to fetch weather data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (city && API_KEY) {
+      fetchTodayWeather();
+    }
+  }, [city, API_KEY]);
+
+  if (loading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-gray-500">Loading today's weather...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
   if (!weatherData) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-        <div className="text-center text-gray-500">Loading weather data...</div>
+        <div className="text-center text-gray-500">No weather data available</div>
       </div>
     );
   }
@@ -65,7 +126,7 @@ const TodayWeather = ({ weatherData, cityName }) => {
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
         <FiMapPin className="text-blue-500" />
-        <h2 className="text-xl font-semibold text-gray-800">{cityName}</h2>
+        <h2 className="text-xl font-semibold text-gray-800">{city}</h2>
       </div>
 
       {/* Main Weather Info */}

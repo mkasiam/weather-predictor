@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { 
   WiSmog, 
   WiDust,
@@ -11,7 +12,67 @@ import {
   FiInfo
 } from 'react-icons/fi';
 
-const AirQuality = ({ airQualityData, cityName }) => {
+const AirQuality = () => {
+  const { city } = useParams();
+  const [airQualityData, setAirQualityData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_KEY = import.meta.env.VITE_API_KEY;
+
+  useEffect(() => {
+    const fetchAirQuality = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get coordinates for the city
+        const geoResponse = await fetch(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
+        );
+        const geoData = await geoResponse.json();
+
+        if (!geoData || geoData.length === 0) {
+          throw new Error("City not found");
+        }
+
+        const { lat, lon } = geoData[0];
+
+        // Fetch air quality data
+        const airResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+        );
+        const airData = await airResponse.json();
+
+        setAirQualityData(airData);
+      } catch (err) {
+        setError(err.message || "Failed to fetch air quality data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (city && API_KEY) {
+      fetchAirQuality();
+    }
+  }, [city, API_KEY]);
+
+  if (loading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-gray-500">Loading air quality data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
+        <div className="text-center text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
   if (!airQualityData || !airQualityData.list || airQualityData.list.length === 0) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
@@ -96,7 +157,7 @@ const AirQuality = ({ airQualityData, cityName }) => {
     <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
       <div className="flex items-center gap-2 mb-6">
         <WiSmog className="text-2xl text-gray-600" />
-        <h3 className="text-xl font-semibold text-gray-800">Air Quality in {cityName}</h3>
+        <h3 className="text-xl font-semibold text-gray-800">Air Quality in {city}</h3>
       </div>
 
       {/* Main AQI Display */}

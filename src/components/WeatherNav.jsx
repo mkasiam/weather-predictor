@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { 
   WiDaySunny, 
   WiTime3, 
@@ -7,13 +8,13 @@ import {
   WiSmog 
 } from 'react-icons/wi';
 
-const WeatherNav = ({ activeTab, onTabChange }) => {
+const WeatherNav = ({ city }) => {
   const tabs = [
-    { id: 'today', label: 'Today', icon: WiDaySunny },
-    { id: 'hourly', label: 'Hourly', icon: WiTime3 },
-    { id: 'daily', label: 'Daily', icon: WiDayCloudyGusts },
-    { id: 'monthly', label: 'Monthly', icon: WiMoonrise },
-    { id: 'air-quality', label: 'Air Quality', icon: WiSmog }
+    { id: 'today', label: 'Today', icon: WiDaySunny, path: `/city/${city}/today` },
+    { id: 'hourly', label: 'Hourly', icon: WiTime3, path: `/city/${city}/hourly` },
+    { id: 'daily', label: 'Daily', icon: WiDayCloudyGusts, path: `/city/${city}/daily` },
+    { id: 'monthly', label: 'Monthly', icon: WiMoonrise, path: `/city/${city}/monthly` },
+    { id: 'air-quality', label: 'Air Quality', icon: WiSmog, path: `/city/${city}/air-quality` }
   ];
 
   return (
@@ -22,18 +23,20 @@ const WeatherNav = ({ activeTab, onTabChange }) => {
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
-            <button
+            <NavLink
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-md transition-all duration-300 ${
-                activeTab === tab.id
-                  ? 'bg-blue-500 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
-              }`}
+              to={tab.path}
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-4 py-3 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
+                }`
+              }
             >
               <IconComponent className="text-xl" />
               <span className="text-sm font-medium">{tab.label}</span>
-            </button>
+            </NavLink>
           );
         })}
       </div>
