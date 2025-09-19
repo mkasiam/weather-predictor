@@ -25,7 +25,6 @@ const MonthlyWeather = () => {
         setLoading(true);
         setError(null);
 
-        // Get coordinates for the city
         const geoResponse = await fetch(
           `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
         );
@@ -37,7 +36,6 @@ const MonthlyWeather = () => {
 
         const { lat, lon } = geoData[0];
 
-        // Fetch 5-day forecast (best available for monthly overview)
         const forecastResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
         );
@@ -80,9 +78,7 @@ const MonthlyWeather = () => {
     );
   }
 
-  // Since OpenWeatherMap free tier only provides 5-day forecast,
-  // we'll create a monthly overview based on available data and trends
-  const availableDays = dailyData.list.slice(0, 40); // All available data points
+  const availableDays = dailyData.list.slice(0, 40);
   
   const getDailyAverages = () => {
     const days = {};

@@ -34,7 +34,7 @@ const Home = () => {
   };
 
   const handleCityClick = (city) => {
-    navigate(`/city/${city.name}`);
+    navigate(`/city/${city.name}/today`);
   };
 
   return (

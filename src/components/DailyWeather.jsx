@@ -23,7 +23,6 @@ const DailyWeather = () => {
         setLoading(true);
         setError(null);
 
-        // Get coordinates for the city
         const geoResponse = await fetch(
           `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
         );
@@ -35,7 +34,6 @@ const DailyWeather = () => {
 
         const { lat, lon } = geoData[0];
 
-        // Fetch 5-day forecast
         const forecastResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
         );
@@ -78,10 +76,9 @@ const DailyWeather = () => {
     );
   }
 
-  // Get daily forecasts (every 8th item represents roughly 24 hours)
   const dailyForecasts = [];
   for (let i = 0; i < dailyData.list.length; i += 8) {
-    if (dailyForecasts.length >= 7) break; // Limit to 7 days
+    if (dailyForecasts.length >= 7) break;
     dailyForecasts.push(dailyData.list[i]);
   }
 

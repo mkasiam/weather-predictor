@@ -26,7 +26,6 @@ const AirQuality = () => {
         setLoading(true);
         setError(null);
 
-        // Get coordinates for the city
         const geoResponse = await fetch(
           `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`
         );
@@ -38,7 +37,6 @@ const AirQuality = () => {
 
         const { lat, lon } = geoData[0];
 
-        // Fetch air quality data
         const airResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`
         );
@@ -107,7 +105,6 @@ const AirQuality = () => {
   };
 
   const getConcentrationLevel = (value, pollutant) => {
-    // Simplified thresholds - in a real app, you'd use official WHO/EPA guidelines
     const thresholds = {
       co: { good: 4000, moderate: 10000, poor: 15000 },
       no: { good: 40, moderate: 80, poor: 200 },
